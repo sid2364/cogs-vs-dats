@@ -11,7 +11,7 @@ tf.reset_default_graph()
 
 image_dim = parse_data.image_dim
 training_data, testing_data = parse_data.get_data()
-model_path = '3.cogs-and-dats.model'
+model_path = '4.cogs-and-dats.model'
 
 print(training_data[0])
 print(testing_data[0])
@@ -51,16 +51,16 @@ def make_model():
 	convnet = conv_2d(convnet, 32, 5, activation='relu')
 	convnet = max_pool_2d(convnet, 5)
 
-	convnet = conv_2d(convnet, 64, 5, activation='relu')
+	convnet = conv_2d(convnet, 128, 5, activation='relu')
+	convnet = max_pool_2d(convnet, 5)
+
+	convnet = conv_2d(convnet, 256, 5, activation='relu')
 	convnet = max_pool_2d(convnet, 5)
 
 	convnet = conv_2d(convnet, 128, 5, activation='relu')
 	convnet = max_pool_2d(convnet, 5)
 
 	convnet = conv_2d(convnet, 64, 5, activation='relu')
-	convnet = max_pool_2d(convnet, 5)
-
-	convnet = conv_2d(convnet, 32, 5, activation='relu')
 	convnet = max_pool_2d(convnet, 5)
 	
 	convnet = fully_connected(convnet, 1024, activation='relu')

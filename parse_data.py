@@ -9,7 +9,7 @@ import pickle
 train_d = os.path.join(os.getcwd(), 'data/train/')
 test_d = os.path.join(os.getcwd(), 'data/test/')
 
-image_dim = 50 # resizing image to this size (60x60)
+image_dim = 60 # resizing image to this size (60x60)
 
 def read_data_and_save():
 	print("Reading training data files.")
