@@ -7,11 +7,11 @@ from tflearn.layers.core import input_data, dropout, fully_connected
 from tflearn.layers.estimator import regression
 
 import tensorflow as tf
-#tf.reset_default_graph()
+tf.reset_default_graph()
 
 image_dim = parse_data.image_dim
 training_data, testing_data = parse_data.get_data()
-model_path = '5.cogs-and-dats.model'
+model_path = '7.cogs-and-dats.model'
 
 #print(training_data[0])
 #print(testing_data[0])
@@ -59,9 +59,6 @@ def make_model():
 	convnet = conv_2d(convnet, 256, 5, activation='relu')
 	convnet = max_pool_2d(convnet, 5)
 
-	convnet = conv_2d(convnet, 128, 5, activation='relu')
-	convnet = max_pool_2d(convnet, 5)
-
 	convnet = conv_2d(convnet, 64, 5, activation='relu')
 	convnet = max_pool_2d(convnet, 5)
 	
@@ -69,7 +66,7 @@ def make_model():
 	convnet = dropout(convnet, 0.8)
 
 	convnet = fully_connected(convnet, 2, activation='softmax')
-	convnet = regression(convnet, optimizer='adam', learning_rate=0.001, loss='categorical_crossentropy', name='targets')
+	convnet = regression(convnet, optimizer='adam', metric='accuracy', learning_rate=0.001, loss='categorical_crossentropy', name='targets')
 
 	model = tflearn.DNN(convnet)
 
@@ -77,7 +74,7 @@ def make_model():
 
 def fit_model(model, X, Y, test_x, test_y):
 	print("Fitting model with data.")
-	model.fit({'input': X}, {'targets': Y}, n_epoch=10, validation_set=({'input': test_x}, {'targets': test_y}), 
+	model.fit({'input': X}, {'targets': Y}, n_epoch=15, validation_set=({'input': test_x}, {'targets': test_y}), 
 		snapshot_step=500, show_metric=True, run_id='cats-vs-dogs')
 	model.save(os.path.join("./models", model_path))
 
@@ -85,9 +82,9 @@ def fit_model(model, X, Y, test_x, test_y):
 
 def get_model():
 	print("Getting the model.")
+	model = make_model()
 	if not os.path.exists(os.path.join('models', model_path + ".index")):
 		print(os.path.join('models', model_path) + " does not exist!")
-		model = make_model()
 		fit_model(model, X, Y, test_x, test_y)
 	else:
 		print(os.path.join('models', model_path) + " exists! Loading the model.")
