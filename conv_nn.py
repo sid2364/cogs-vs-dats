@@ -7,27 +7,29 @@ from tflearn.layers.core import input_data, dropout, fully_connected
 from tflearn.layers.estimator import regression
 
 import tensorflow as tf
-tf.reset_default_graph()
+#tf.reset_default_graph()
 
 image_dim = parse_data.image_dim
 training_data, testing_data = parse_data.get_data()
-model_path = '4.cogs-and-dats.model'
+model_path = '5.cogs-and-dats.model'
 
-print(training_data[0])
-print(testing_data[0])
+#print(training_data[0])
+#print(testing_data[0])
 
-X = np.array([t[0] for t in training_data])
+test_set = int(len(training_data)*0.80)
+
+X = np.array([t[0] for t in training_data[:test_set]])
 Y = []
-for t in training_data:
+for t in training_data[:test_set]:
 	if t[1] == 0:
 		Y.append([1,0])
 	else:
 		Y.append([0,1])
 #Y = np.array(Y)
 
-test_x = np.array([t[0] for t in testing_data])
+test_x = np.array([t[0] for t in training_data[test_set:]])
 test_y = []
-for t in testing_data:
+for t in training_data[test_set:]:
 	if t[1] == 0:
 		test_y.append([1, 0])
 	else:
@@ -77,17 +79,19 @@ def fit_model(model, X, Y, test_x, test_y):
 	print("Fitting model with data.")
 	model.fit({'input': X}, {'targets': Y}, n_epoch=10, validation_set=({'input': test_x}, {'targets': test_y}), 
 		snapshot_step=500, show_metric=True, run_id='cats-vs-dogs')
-	model.save(model_path)
+	model.save(os.path.join("./models", model_path))
 
 	return model
 
 def get_model():
 	print("Getting the model.")
-	model = make_model()
-	if not os.path.exists(model_path):
+	if not os.path.exists(os.path.join('models', model_path + ".index")):
+		print(os.path.join('models', model_path) + " does not exist!")
+		model = make_model()
 		fit_model(model, X, Y, test_x, test_y)
 	else:
-		model.load(model_path)
+		print(os.path.join('models', model_path) + " exists! Loading the model.")
+		model.load(os.path.join('model', model_path))
 	return model
 
 if __name__ == "__main__":
