@@ -11,16 +11,32 @@ test_d = os.path.join(os.getcwd(), 'data/test/')
 
 image_dim = 45 # resizing image to this size (60x60)
 
+def make_dog_cat(dp):
+	if dp == 'cat':
+		return [0, 1]
+	return [1, 0]
+
+def get_dog_cat(arr):
+	if arr[0] == 0:
+		return 'dog'
+	return 'cat'
+
+def read_data_for_one_image(filen):
+	file_n = os.path.join(os.getcwd(), filen)
+	if os.path.exists(file_n):
+		image = cv2.imread(os.path.join(file_n), cv2.IMREAD_GRAYSCALE)
+		image = cv2.resize(image, (image_dim, image_dim))
+		return image
+	print("Image file does not exist.")
+	return -1
+
 def read_data_and_save():
 	print("Reading training data files.")
 	training_data = []
 	for image_file in os.listdir(train_d):
 		cat_or_dog = image_file.split('.')[-3] # cat.1.jpg
 		image_id = image_file.split('.')[-2] # not req for training!
-		if cat_or_dog == 'cat':
-			cod_class = 0
-		elif cat_or_dog == 'dog':
-			cod_class = 1
+		cod_class = make_dog_cat(cat_or_dog)
 		image_ = cv2.imread(os.path.join(train_d, image_file), cv2.IMREAD_GRAYSCALE)
 		image = cv2.resize(image_, (image_dim, image_dim))
 		training_data.append([np.array(image), cod_class]) # [image, class label]
@@ -31,7 +47,7 @@ def read_data_and_save():
 		image_id = image_file.split('.')[-2] # 1.jpg
 		image_ = cv2.imread(os.path.join(test_d, image_file), cv2.IMREAD_GRAYSCALE)
 		image = cv2.resize(image_, (image_dim, image_dim))
-		testing_data.append([np.array(image), image_id]) # [image, class label]
+		testing_data.append([np.array(image), image_id]) # [image, id]
 
 	#print(training_data[0])
 	#print(testing_data[0])

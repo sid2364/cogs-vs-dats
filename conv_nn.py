@@ -1,4 +1,5 @@
 import parse_data
+import pickle
 import os
 import numpy as np
 import tflearn
@@ -11,39 +12,21 @@ tf.reset_default_graph()
 
 image_dim = parse_data.image_dim
 training_data, testing_data = parse_data.get_data()
-model_path = '7.cogs-and-dats.model'
+model_path = '9.cogs-and-dats.model'
 
-#print(training_data[0])
-#print(testing_data[0])
-
+# Make training set and testing set from the entire labeled training data
 test_set = int(len(training_data)*0.80)
-
 X = np.array([t[0] for t in training_data[:test_set]])
-Y = []
-for t in training_data[:test_set]:
-	if t[1] == 0:
-		Y.append([1,0])
-	else:
-		Y.append([0,1])
-#Y = np.array(Y)
-
-test_x = np.array([t[0] for t in training_data[test_set:]])
-test_y = []
-for t in training_data[test_set:]:
-	if t[1] == 0:
-		test_y.append([1, 0])
-	else:
-		test_y.append([0, 1])
-#test_y = np.array(test_y)
-
+Y = np.array([t[1] for t in training_data[:test_set]])
 X = X.reshape([-1, image_dim, image_dim, 1])
+test_x = np.array([t[0] for t in training_data[test_set:]])
+test_y = np.array([t[1] for t in training_data[test_set:]])
 test_x = test_x.reshape([-1, image_dim, image_dim, 1])
 
-#Y = Y.reshape([-1, 2])
-#test_y = test_y.reshape([-1, 2])
-
-print(X.shape)
-#print(Y.shape)
+# Make array from testing data that can be passed for prediction
+predict_this_X = np.array([t[0] for t in testing_data])
+predict_this_X = predict_this_X.reshape([-1, image_dim, image_dim, 1])
+predict_this_X_id = np.array([t[1] for t in testing_data])
 
 print(image_dim)
 def make_model():
@@ -91,5 +74,14 @@ def get_model():
 		model.load(os.path.join('model', model_path))
 	return model
 
+def make_predictions(model, test_arr):
+	return model.predict(test_arr)
+
 if __name__ == "__main__":
-	m = get_model()
+	mdl = get_model()
+	predicted_data = make_predictions(mdl, predict_this_X)
+	final = []
+	for i in range(len(predicted_data)):
+		final.append([predict_this_X_id[i], predicted_data[i]])
+	with open('predictions.pkl', 'w') as filep:
+		pickle.dump(final, filep)
