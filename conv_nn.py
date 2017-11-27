@@ -8,6 +8,10 @@ from tflearn.layers.conv import conv_2d, max_pool_2d
 from tflearn.layers.core import input_data, dropout, fully_connected
 from tflearn.layers.estimator import regression
 
+
+os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
+
+# not required coz not jupyter
 import tensorflow as tf
 tf.reset_default_graph()
 
@@ -82,7 +86,7 @@ def make_predictions(model, test_arr):
 def get_higher_proba(prediction):
 	# [1, 0] is dog, [0, 1] is cat
 	#prediction.reshape(-1, 2)
-	print(prediction)
+	#print(prediction)
 	if prediction[0] > prediction[1]:
 		return 1
 	return 0
