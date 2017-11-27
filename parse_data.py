@@ -18,8 +18,8 @@ def make_dog_cat(dp):
 
 def get_dog_cat(arr):
 	if arr[0] == 0:
-		return 'dog'
-	return 'cat'
+		return 1 #'dog'
+	return 0 #'cat'
 
 def read_data_for_one_image(filen):
 	file_n = os.path.join(os.getcwd(), filen)
@@ -28,7 +28,7 @@ def read_data_for_one_image(filen):
 		image = cv2.resize(image, (image_dim, image_dim))
 		return image
 	print("Image file does not exist.")
-	return -1
+	return None
 
 def read_data_and_save():
 	print("Reading training data files.")

@@ -3,6 +3,7 @@ import pickle
 import os
 import numpy as np
 import tflearn
+import csv
 from tflearn.layers.conv import conv_2d, max_pool_2d
 from tflearn.layers.core import input_data, dropout, fully_connected
 from tflearn.layers.estimator import regression
@@ -28,7 +29,7 @@ predict_this_X = np.array([t[0] for t in testing_data])
 predict_this_X = predict_this_X.reshape([-1, image_dim, image_dim, 1])
 predict_this_X_id = np.array([t[1] for t in testing_data])
 
-print(image_dim)
+#print(image_dim)
 def make_model():
 	print("Making the model.")
 	convnet = input_data(shape=[None, image_dim, image_dim, 1], name='input')
@@ -75,13 +76,43 @@ def get_model():
 	return model
 
 def make_predictions(model, test_arr):
-	return model.predict(test_arr)
+	print("Making predictions!")
+	return model.predict(test_arr)	
+
+def get_higher_proba(prediction):
+	# [1, 0] is dog, [0, 1] is cat
+	#prediction.reshape(-1, 2)
+	print(prediction)
+	if prediction[0] > prediction[1]:
+		return 1
+	return 0
+
+def make_one_prediction(model, filen):
+	print("Reading image data.")
+	test_arr = parse_data.read_data_for_one_image(filen)
+	test_arr = test_arr.reshape([-1, image_dim, image_dim, 1])
+	if test_arr is None:
+		print("That's not a valid file.")
+		return
+	prediction = model.predict(test_arr)[0]
+
+	if get_higher_proba(prediction) == 0:
+		print("==== That is a cat! ====")
+	else:
+		print("==== That's a dog! ====")
+	print("Dog %s vs. Cat %s" % (prediction[0], prediction[1]))
 
 if __name__ == "__main__":
 	model = get_model()
 	predicted_data = make_predictions(model, predict_this_X)
 	final = []
-	for i in range(len(predicted_data)):
-		final.append([predict_this_X_id[i], predicted_data[i]])
+	with open('submission.csv', 'w') as filep:
+		writer = csv.writer(filep, delimiter=',')
+		writer.writerow(['id', 'label'])
+		for i in range(len(predicted_data)):
+			final.append([predict_this_X_id[i], predicted_data[i]])
+			print([predict_this_X_id[i], predicted_data[i], get_higher_proba(predicted_data[i])])
+			writer.writerow([predict_this_X_id[i], get_higher_proba(predicted_data[i])])
+
 	with open('predictions.pkl', 'w') as filep:
 		pickle.dump(final, filep)
